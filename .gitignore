@@ -1,0 +1,10 @@
+/.vscode
+/.vs
+
+/out
+/build
+/cmake-build
+
+CMakeSettings.json
+
+/csv
