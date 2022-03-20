@@ -47,6 +47,5 @@ public:
    void importWeights( char *file);
    void displayGraph(){graph.display();};
    void displayBestSolution();
-   void solvesmthing();
 };
 #endif
