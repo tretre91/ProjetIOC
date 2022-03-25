@@ -155,8 +155,8 @@ void Graph2::toDegree2(const vector<std::pair<Vertex, bool>>& list, GraphNO& g) 
         }
     }
 
-    for (auto& [v, pick] : list) {
-        weights[v] = pick ? 10 : -10;
+    for (auto& p : list) {
+        weights[p.first] = p.second ? 10 : -10;
     }
 }
 
