@@ -10,15 +10,18 @@ typedef unsigned int Vertex;
 class StableSolver
 {
 private:
-    float currentCost;
+    float currentCost = 0;
     std::vector<bool> currentSolution;
-    float bestCost;
+    float bestCost = 0;
     std::vector<bool> bestSolution;
     Graph2 graph;
 
     inline void resetSolution(unsigned int nbVertex) {
         currentCost = 0.0f;
-        currentSolution.resize(nbVertex, false);
+        currentSolution.resize(nbVertex);
+        for (size_t i = 0; i < currentSolution.size(); i++) {
+            currentSolution[i] = false;
+        }
     }
 
     void solveComp(const composanteConnexe& comp);
@@ -27,6 +30,8 @@ private:
 
 public:
     void displaySolution() const;
+
+    void init(GraphNO& graph, const std::vector<std::pair<Vertex, bool>>& list);
 
     float solve();
 

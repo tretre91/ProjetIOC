@@ -12,49 +12,18 @@ void StableSolver::displaySolution() const {
     std::cout << "\nTotal weigth: " << currentCost << '\n';
 }
 
+void StableSolver::init(GraphNO& g, const std::vector<std::pair<Vertex, bool>>& list) {
+    graph.toDegree2(list, g);
+
+}
+
 float StableSolver::solve() {
-    std::vector<float> graphWeights = graph.getWeights();
-    std::vector<float> weights;
-
-    for (auto& comp : graph.decoupeCompConnexe()) {
+    for (auto& comp : graph.decoupeCompConnexe2()) {
         solveComp(comp);
-            const std::vector<node>& vertices = comp.neighbors;
-
-        if (comp.type == typeGraphe::SOLO) {
-            auto first = std::find_if(vertices.begin(), vertices.end(), [](const node& n) { n.neighbors.second == -1; });
-
-            node iter = *first;
-            size_t id = iter.id;
-            weights.push_back(graphWeights[id]);
-
-            iter = vertices[iter.neighbors.first];
-
-            while (iter.neighbors.second != -1) {
-                weights.push_back(graphWeights[iter.id]);
-                if (iter.neighbors.first == iter.id) {
-                    iter = vertices[iter.neighbors.second];
-                } else {
-                    iter = vertices[iter.neighbors.first];
-                }
-            }
-
-            weights.push_back(graphWeights[iter.id]);
-        } else if (comp.type == typeGraphe::CHAINE) {
-            node iter = vertices[0];
-            int first = iter.id;
-
-            while (iter.id != first) {
-                weights.push_back(graphWeights[iter.id]);
-                if (iter.neighbors.first == iter.id) {
-                    iter = vertices[iter.neighbors.second];
-                } else {
-                    iter = vertices[iter.neighbors.first];
-                }
-            }
-            
-        }
-        bestCost = bestCost = std::max(currentCost, bestCost);
+        bestCost = std::max(currentCost, bestCost);
     }
+
+    return bestCost;
 }
 
 void StableSolver::solveComp(const composanteConnexe& comp) {
@@ -72,6 +41,7 @@ void StableSolver::solveComp(const composanteConnexe& comp) {
 }
 
 void StableSolver::solveLine(const std::vector<float>& weights) {
+    resetSolution(weights.size());
     std::vector<float> m_true(weights.size(), 0.0f);
     std::vector<float> m_false(weights.size(), 0.0f);
 
@@ -115,6 +85,7 @@ public:
 };
 
 void StableSolver::solveCycle(const std::vector<float>& weights) {
+    resetSolution(weights.size());
     std::vector<Info> m(weights.size());
 
     m[0](true, false) = std::numeric_limits<float>::lowest();

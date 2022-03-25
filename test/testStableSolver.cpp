@@ -20,7 +20,10 @@ std::vector<float> importFile(const std::string& filename) {
 
 int main() {
     StableSolver solver;
-    solver.solveLine(importFile("C:/Users/Tretr/Desktop/Université/L3-S6/IOC/projet/test/instances/test_chaine.txt"));
-    solver.displaySolution();
+    GraphNO g;
+    g.importGraphDIMACS("C:/Users/Tretr/Desktop/Université/L3-S6/IOC/projet/test/instances/custom.col");
+    solver.init(g, {});
+    float cost = solver.solve();
+    std::cout << cost << '\n';
     return 0;
 }
