@@ -4,43 +4,33 @@
 #include <utility>
 #include <vector>
 #include "graph2.hpp"
+#include "weightedMaximumStableSolver.hpp"
 
 typedef unsigned int Vertex;
 
-class StableSolver
+class StableSolver : public WeightedMaximumStableSolver
 {
 private:
-    float currentCost = 0;
-    std::vector<bool> currentSolution;
-    float bestCost = 0;
-    std::vector<bool> bestSolution;
-    Graph2 graph;
-
-    inline void resetSolution(unsigned int nbVertex) {
-        currentCost = 0.0f;
-        currentSolution.resize(nbVertex);
-        for (size_t i = 0; i < currentSolution.size(); i++) {
-            currentSolution[i] = false;
-        }
-    }
+    unsigned int currentSize;
+    Graph2 graph2;
 
     void solveComp(const composanteConnexe& comp);
-    void solveLine(const std::vector<float>& weights);
-    void solveCycle(const std::vector<float>& weights);
+    void solveLine(const composanteConnexe& comp);
+    void solveCycle(const composanteConnexe& comp);
 
 public:
-    void displaySolution() const;
+    void updateFixed(const vector<std::pair<Vertex, bool>>& list);
 
-    void init(GraphNO& graph, const std::vector<std::pair<Vertex, bool>>& list);
+    void init(GraphNO& graph);
 
-    float solve();
+    void solve();
 
-    float getCurrentCost() const {
-        return currentCost;
+    float getCost() const {
+        return bestCost;
     }
 
-    float getBestCost() const {
-        return bestCost;
+    unsigned int getSize() const {
+        return currentSize;
     }
    
 };

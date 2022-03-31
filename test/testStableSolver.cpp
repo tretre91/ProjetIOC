@@ -1,5 +1,6 @@
 #include "../src/stableSolver.hpp"
 #include <iostream>
+<<<<<<< HEAD
 #include <fstream>
 #include <cstdlib>
 #include <filesystem>
@@ -57,23 +58,16 @@ vector<std::string> initInstances(){
     }
     return listFile;
 }
+=======
+>>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
 
-std::vector<float> importFile(const std::string& filename) {
-    std::ifstream file(filename);
-
-    if (file.is_open()) {
-        char c;
-        size_t size;
-        file >> c >> size;
-        std::vector<float> values(size);
-        for (float& v : values) {
-            file >> v;
-        }
-        return values;
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cout << "Usage: " << argv[0] << " <nom de l'instance>\n";
+        return 0;
     }
-    return {};
-}
 
+<<<<<<< HEAD
 int main() {
     vector<string> listInstances = initInstances();
     
@@ -88,5 +82,28 @@ int main() {
     }
     //g.importGraphDIMACS("/home/brice/Bureau/IOC/ProjetIOC/test/instances/custom.col");
 
+=======
+    StableSolver solver;
+    GraphNO g;
+    g.importGraphDIMACS(argv[1]);
+    solver.init(g);
+    g.display();
+    std::cout << '\n';
+
+    solver.updateFixed({});
+    solver.solve();
+    std::cout << "Stable size : " << solver.getSize() << '\n';
+    solver.displayBestSolution();
+    
+    // Decommenter cette partie si test avec custom.col
+    // on a une chaine 5 - 6 - 7, si on fixe 6, 5 et 7 ne sont plus inclus dans la solution optimale
+    
+    /* std::cout << "\nWith vertex 6 included :\n";
+    solver.updateFixed({{6u, true}});
+    solver.solve();
+    std::cout << "Stable size : " << solver.getSize() << '\n';
+    solver.displayBestSolution(); */
+    
+>>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
     return 0;
 }

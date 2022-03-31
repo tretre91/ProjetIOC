@@ -8,7 +8,7 @@ using namespace std;
 typedef unsigned int Vertex;
 
 struct node {
-    int id;
+    Vertex id;
     std::pair<Vertex, Vertex> neighbors;
 };
 
@@ -20,10 +20,9 @@ enum class typeGraphe
 };
 
 struct composanteConnexe {
-    int size = 0;
+    unsigned int size = 0;
     std::vector<node> neighbors;
-    std::vector<float> weights;
-    typeGraphe type;
+    typeGraphe type = typeGraphe::SOLO;
 
     composanteConnexe() = default;
     composanteConnexe(typeGraphe type) : type(type), size(0) {}
@@ -35,7 +34,6 @@ class Graph2
 private:
     vector<std::pair<Vertex, Vertex>> matrix; // ou passer en vector, où les voisins de vertex sont à l'indice vertex et vertex+1
     Vertex nbVertex;
-    vector<float> weights;
     void get_params(char* Preamble);
     void removeEdge(Vertex v1, Vertex v2);
 
@@ -43,8 +41,12 @@ private:
     composanteConnexe explore(typeGraphe type, std::vector<bool>& explored, const node& first, Function stopCondition);
 
 public:
+<<<<<<< HEAD
     void toDegree2(const vector<std::pair<Vertex, bool>>& list, GraphNO& g);
     std::vector<vector<pair<Vertex, Vertex>>> getComponents();
+=======
+    void toDegree2(GraphNO& g);
+>>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
     void initEmptyGraph(Vertex nbVertices);
     bool isEdge(Vertex v, Vertex v1);
     bool hasNoNeighbor(Vertex v1);
@@ -61,9 +63,6 @@ public:
     // void importWeights(char *file);
     void display();
     Vertex getDegree(Vertex vertex);
-    vector<float> getWeights() {
-        return weights;
-    }
 
     std::vector<composanteConnexe> decoupeCompConnexe();
     std::vector<composanteConnexe> decoupeCompConnexe2();

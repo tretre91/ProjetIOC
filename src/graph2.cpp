@@ -9,10 +9,13 @@ void Graph2::initEmptyGraph(Vertex nbVertices) {
     matrix.clear();
     matrix.resize(nbVertex, {-1, -1});
     matrix.shrink_to_fit();
+<<<<<<< HEAD
     weights.clear();
     weights.resize(nbVertex, 1.f);
     weights.shrink_to_fit();
     
+=======
+>>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
 }
 
 bool Graph2::isEdge(Vertex v1, Vertex v2) {
@@ -56,7 +59,7 @@ bool Graph2::hasNoNeighbor(Vertex v1) {
 
 void Graph2::display() {
     cout << endl;
-    for (int vertex = 0; vertex < nbVertex; vertex++) {
+    for (Vertex vertex = 0; vertex < nbVertex; vertex++) {
         cout << "Sommet " << vertex << " : " << endl;
         int val = 0;
         int v1;
@@ -73,8 +76,7 @@ void Graph2::display() {
         } else {
             v2 = -1;
         }
-        cout << v1 << " & " << v2 << " -> " << val << " | "
-             << "Weight : " << weights[vertex] << endl;
+        cout << v1 << " & " << v2 << " -> " << val << endl;
     }
     cout << endl;
 }
@@ -143,7 +145,7 @@ void Graph2::get_params(char* Preamble)
     nbVertex = Nr_vert;
 }
 
-void Graph2::toDegree2(const vector<std::pair<Vertex, bool>>& list, GraphNO& g) {
+void Graph2::toDegree2(GraphNO& g) {
     initEmptyGraph(g.getNbVertices());
 
     for (Vertex v = 0; v < g.getNbVertices(); v++) {
@@ -155,10 +157,13 @@ void Graph2::toDegree2(const vector<std::pair<Vertex, bool>>& list, GraphNO& g) 
             addEdgeFast(v, voisins[0], voisins[1]);
         }
     }
+<<<<<<< HEAD
 
     for (std::pair<Vertex, bool> p : list) { //il aime pas la syntaxe jolie
         weights[p.first] = p.second ? 10 : -10;
     }
+=======
+>>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
 }
 
 void Graph2::importGraphDIMACS(char* file) {
@@ -195,7 +200,7 @@ void Graph2::importGraphDIMACS(char* file) {
             // addEdge(i-1, j-1);
             // if( (i, j) != (0, 0)){ //jsp exactement ce qui fait ça mais tant pis
             addEdgeFast(n, i, j);
-            weights[n] = k;
+            // weights[n] = k;
             n++; //
                  //}
             break;
@@ -227,12 +232,12 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe() {
     vector<composanteConnexe> graphesConnexes;
     // graphesConnexes.shrink_to_fit();
 
-    for (int i = 0; i < nbVertex; i++) {
+    for (Vertex i = 0; i < nbVertex; i++) {
         remaining[i] = true; // normalement on peut faire ça à l'init mais il semblerait que je sois nul
         degree[i] = getDegree(i);
     }
 
-    int vertexHandled = 0; // pas indispensable, ça raccourci juste le temps d'exec à la toute dernière composante connexe
+    unsigned int vertexHandled = 0; // pas indispensable, ça raccourci juste le temps d'exec à la toute dernière composante connexe
     int idmin = 0;
 
     while (vertexHandled < nbVertex) {
@@ -369,7 +374,8 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe() {
 vector<composanteConnexe> Graph2::decoupeCompConnexe2() {
     std::vector<bool> explored(nbVertex, false);
     std::vector<unsigned int> degrees(nbVertex);
-    for (size_t i = 0; i < nbVertex; i++) {
+
+    for (Vertex i = 0; i < nbVertex; i++) {
         degrees[i] = getDegree(i);
     }
 
@@ -378,16 +384,12 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe2() {
     for (Vertex v = 0; v < nbVertex; v++) {
         if (!explored[v]) {
             if (degrees[v] == 0) {
-                composanteConnexe comp(typeGraphe::SOLO, node{(int)v, {-1, -1}});
-                comp.weights = {weights[v]};
+                composanteConnexe comp(typeGraphe::SOLO, node{v, make_pair(-1, -1)});
                 comps.emplace_back(std::move(comp));
                 explored[v] = true;
             } else if (degrees[v] == 1) {
                 node first = {v, getNeighbors(v)};
                 composanteConnexe comp = explore(typeGraphe::CHAINE, explored, first, [](const node& n) { return n.neighbors.second == -1; });
-                for (const node& n : comp.neighbors) {
-                    comp.weights.push_back(weights[n.id]);
-                }
                 comps.emplace_back(std::move(comp));
             }
         }
@@ -397,9 +399,6 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe2() {
         if (!explored[v]) {
             node first = {v, getNeighbors(v)};
             composanteConnexe comp = explore(typeGraphe::CYCLE, explored, first, [initial = v](const node& n) { return n.id == initial; });
-            for (const node& n : comp.neighbors) {
-                comp.weights.push_back(weights[n.id]);
-            }
             comps.emplace_back(std::move(comp));
         }
     }
