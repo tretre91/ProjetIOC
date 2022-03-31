@@ -60,7 +60,7 @@ void WeightedMaximumStableSolver::importGraphDIMACS( char *file){
 //note 1 : *peut* être worth de trier les sommets par degré (simplifierait surtout les disjonctions de cas (un tout petit peu))
 //note 2 : on sait que le nombre max de voisins est 2, peut modifier graphNO.getNeighbors pour prendre ça en compte (done)
 //note 3 : on pourrait ne pas gérer les poids dans cette fonction, les sommets gardent leur numéro, le poids est donc récupérable après
-vector<WeightedMaximumStableSolver::composanteConnexe> WeightedMaximumStableSolver::decoupeCompConnexe(){
+/*vector<WeightedMaximumStableSolver::composanteConnexe> WeightedMaximumStableSolver::decoupeCompConnexe(){
 	// on récupère le premier sommet, on suit la matrice d'adjacence jusqu'à ne plus avoir de nouveau sommet
     vector<Vertex> remaining  (nbVertex, true);
     // remaining.shrink_to_fit();
@@ -75,12 +75,12 @@ vector<WeightedMaximumStableSolver::composanteConnexe> WeightedMaximumStableSolv
 	int idmin = 0;
 
 	for(int i = 0; i < nbVertex; i++){
-		if(graph.getDegree[i] == 0){
+		if(graph.getDegree(i) == 0){
 			remaining[i] = false;
 			vertexHandled++;
-			node n = (i, matrix[i]); //mdr je sais pas si c'est ça la syntaxe
+			node n = (i, graph.matrix[i]); //mdr je sais pas si c'est ça la syntaxe
 			graphesConnexes.neighbors.emplace_back(1, {n}, {}, SOLO);
-		}else if (graph.getDegree[i] == 1 && remaining[i]){
+		}else if (graph.getDegree(i) == 1 && remaining[i]){
 			composanteConnexe currentComposanteConnexe = (1, {} , {}, CHAINE);
 			
 			//on prend l'unique voisin et on parcourt
@@ -134,7 +134,7 @@ vector<WeightedMaximumStableSolver::composanteConnexe> WeightedMaximumStableSolv
 
 		while(!remaining[idmin]){
 			idmin++;
-		}
+		}*/
 
 		/*if(degree[idmin] == 0){
 			//suppression du sommet
@@ -195,7 +195,7 @@ vector<WeightedMaximumStableSolver::composanteConnexe> WeightedMaximumStableSolv
 				currentComposanteConnexe.size++;
 				currentComposanteConnexe.neighbors.push_back(currentNode);
 			}
-		}else*/if(degree[idmin] == 2{ //cas degré 2
+		}else*//*if(degree[idmin] == 2{ //cas degré 2
 			//sommet de départ déjà stocké dans startingVertex, si on retombe dessus on arrête, si on tombe sur un sommet de degré 1 on repart dans l'autre sens
 			//on itère comme dans le cas degree = 1
 			std::pair<Vertex, Vertex> startingNeighbors = graph.getNeighbors(idmin);
@@ -257,7 +257,7 @@ vector<WeightedMaximumStableSolver::composanteConnexe> WeightedMaximumStableSolv
 		graphesConnexes.emplace_back(currentComposanteConnexe);
 	}
 	return graphesConnexes;
-}
+}*/
 
 void WeightedMaximumStableSolver::displayCompConnexe(){
 	cout << endl;

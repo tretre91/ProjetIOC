@@ -18,11 +18,11 @@ void StableSolver::init(GraphNO& g, const std::vector<std::pair<Vertex, bool>>& 
 }
 
 float StableSolver::solve() {
+    bestCost = 0;
     for (auto& comp : graph.decoupeCompConnexe2()) {
         solveComp(comp);
-        bestCost = std::max(currentCost, bestCost);
+        bestCost += currentCost;
     }
-
     return bestCost;
 }
 

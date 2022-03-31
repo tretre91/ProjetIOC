@@ -12,6 +12,7 @@ void Graph2::initEmptyGraph(Vertex nbVertices) {
     weights.clear();
     weights.resize(nbVertex, 1.f);
     weights.shrink_to_fit();
+    
 }
 
 bool Graph2::isEdge(Vertex v1, Vertex v2) {
@@ -155,8 +156,8 @@ void Graph2::toDegree2(const vector<std::pair<Vertex, bool>>& list, GraphNO& g) 
         }
     }
 
-    for (auto& [v, pick] : list) {
-        weights[v] = pick ? 10 : -10;
+    for (std::pair<Vertex, bool> p : list) { //il aime pas la syntaxe jolie
+        weights[p.first] = p.second ? 10 : -10;
     }
 }
 
@@ -402,14 +403,13 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe2() {
             comps.emplace_back(std::move(comp));
         }
     }
-
     return comps;
 }
 
 void Graph2::displayCompConnexe() {
     cout << endl;
     display();
-    vector<composanteConnexe> list = decoupeCompConnexe();
+    vector<composanteConnexe> list = decoupeCompConnexe2();
     for (const composanteConnexe& c : list) {
         cout << c.size << " ";
         cout << "Type : ";

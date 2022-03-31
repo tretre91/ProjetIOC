@@ -44,7 +44,7 @@ private:
 
 public:
     void toDegree2(const vector<std::pair<Vertex, bool>>& list, GraphNO& g);
-    std::vector<vector<pair<Vertex, Vertex>>> getComponents() {}
+    std::vector<vector<pair<Vertex, Vertex>>> getComponents();
     void initEmptyGraph(Vertex nbVertices);
     bool isEdge(Vertex v, Vertex v1);
     bool hasNoNeighbor(Vertex v1);

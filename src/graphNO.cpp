@@ -162,14 +162,12 @@ void GraphNO::importGraphDIMACS( char *file)
 	get_params(Preamble);
 	
 	initEmptyGraph(nbVertex);
-
 	while ((c = fgetc(fp)) != EOF){
 		switch (c)
 		  {
 			case 'e':
 			  if (!fscanf(fp, "%d %d", &i, &j))
 				{ printf("ERROR: corrupted inputfile\n"); exit(10); }
-			  
 			  addEdge(j-1, i-1);
 			  break;
 			  

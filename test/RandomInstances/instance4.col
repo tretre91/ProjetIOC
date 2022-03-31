@@ -1,0 +1,5 @@
+c FILE: instance4.col
+c SOURCE: RANDOM GENERATION
+p edge 70 2
+e 37 27
+e 62 67
