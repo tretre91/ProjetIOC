@@ -29,6 +29,7 @@ void StableSolver::solveComp(const composanteConnexe& comp) {
     switch (comp.type) {
     case typeGraphe::SOLO:
         currentCost += weights[comp.neighbors[0].id];
+        currentSolution[comp.neighbors[0].id] = true;
         currentSize++;
         break;
     case typeGraphe::CHAINE:
