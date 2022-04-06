@@ -36,32 +36,36 @@ private:
     Vertex nbVertex;
     void get_params(char* Preamble);
     void removeEdge(Vertex v1, Vertex v2);
+    vector<float> weights;
 
     template<typename Function>
     composanteConnexe explore(typeGraphe type, std::vector<bool>& explored, const node& first, Function stopCondition);
 
 public:
-<<<<<<< HEAD
-    void toDegree2(const vector<std::pair<Vertex, bool>>& list, GraphNO& g);
-    std::vector<vector<pair<Vertex, Vertex>>> getComponents();
-=======
     void toDegree2(GraphNO& g);
->>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
+    void toDegree2General(GraphNO& g);
+    void selectRandomNeighborsGNO(GraphNO& g, Vertex v);
+    void toDegree2Alea(GraphNO& g);
+    void toDegree2Max(GraphNO& g);
+    void sortByRatio(vector<std::pair<Vertex, float>> &list);
     void initEmptyGraph(Vertex nbVertices);
     bool isEdge(Vertex v, Vertex v1);
     bool hasNoNeighbor(Vertex v1);
     void addEdge(Vertex v, Vertex v1);
     void addEdgeFast(Vertex v, Vertex v1, Vertex v2);
+    void addEdgeBi(Vertex v1, Vertex v2);
     Vertex getNbVertices() {
         return nbVertex;
     };
+    vector<float> getWeights(){return weights;}
     void deleteGraph() {
         matrix.clear();
         nbVertex = 0;
     };
     void importGraphDIMACS(char* file);
     // void importWeights(char *file);
-    void display();
+    void displayWithDegree();
+    void display2();
     Vertex getDegree(Vertex vertex);
 
     std::vector<composanteConnexe> decoupeCompConnexe();

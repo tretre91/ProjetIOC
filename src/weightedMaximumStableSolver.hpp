@@ -17,13 +17,12 @@ protected:
 
     void initSolution();
 
-protected:
+//protected:
     bool checkSolution();
     void updateBestSolution();
 
 public:
     void importGraphDIMACS(char* file);
-    void importWeights(char* file);
     void displayBestSolution();
 };
 #endif

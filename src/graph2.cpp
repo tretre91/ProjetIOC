@@ -3,19 +3,14 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
+#include <random>
 
 void Graph2::initEmptyGraph(Vertex nbVertices) {
     nbVertex = nbVertices;
+    weights.clear();
     matrix.clear();
     matrix.resize(nbVertex, {-1, -1});
     matrix.shrink_to_fit();
-<<<<<<< HEAD
-    weights.clear();
-    weights.resize(nbVertex, 1.f);
-    weights.shrink_to_fit();
-    
-=======
->>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
 }
 
 bool Graph2::isEdge(Vertex v1, Vertex v2) {
@@ -32,6 +27,11 @@ void Graph2::addEdge(Vertex v, Vertex v1) {
 
 void Graph2::addEdgeFast(Vertex v, Vertex v1, Vertex v2) {
     matrix[v] = make_pair(v1, v2);
+}
+
+void Graph2::addEdgeBi(Vertex v1, Vertex v2){
+    addEdge(v1, v2);
+    addEdge(v2, v1);
 }
 
 void Graph2::removeEdge(Vertex v1, Vertex v2) {
@@ -57,7 +57,7 @@ bool Graph2::hasNoNeighbor(Vertex v1) {
 
 }*/
 
-void Graph2::display() {
+void Graph2::displayWithDegree() {
     cout << endl;
     for (Vertex vertex = 0; vertex < nbVertex; vertex++) {
         cout << "Sommet " << vertex << " : " << endl;
@@ -79,6 +79,19 @@ void Graph2::display() {
         cout << v1 << " & " << v2 << " -> " << val << endl;
     }
     cout << endl;
+}
+
+void Graph2::display2(){
+    for(int i = 0; i < nbVertex; i++){
+        cout << "neighbors of " << i << " :";
+        if(getDegree(i) > 0){
+            cout << " " << getNeighbors(i).first;
+            if(getDegree(i) > 1){
+                cout << " " << getNeighbors(i).second;
+            }
+        }
+        cout << '\n';
+    }
 }
 
 // Même chose que getDegree, mais en arrêtant de chercher dès qu'on a 2 voisins
@@ -145,26 +158,170 @@ void Graph2::get_params(char* Preamble)
     nbVertex = Nr_vert;
 }
 
+/**
+ * @brief a graph2-reduction algorithm that works for GraphNO where maximum degree = 2
+ * 
+ * @param g the GraphNO to reduce
+ */
 void Graph2::toDegree2(GraphNO& g) {
     initEmptyGraph(g.getNbVertices());
+
+    weights = g.getWeights();
+
+    vector<Vertex> degree (nbVertex, 0);
 
     for (Vertex v = 0; v < g.getNbVertices(); v++) {
         std::vector<Vertex> voisins = g.getNeighbors(v);
 
         if (voisins.size() == 1) {
             addEdge(v, voisins[0]);
+
         } else if (voisins.size() == 2) {
+            
+
             addEdgeFast(v, voisins[0], voisins[1]);
         }
     }
-<<<<<<< HEAD
-
-    for (std::pair<Vertex, bool> p : list) { //il aime pas la syntaxe jolie
-        weights[p.first] = p.second ? 10 : -10;
-    }
-=======
->>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
 }
+
+/**
+ * @brief a graph2-reduction algorithm that works for GraphNOs of any degree
+ * 
+ * @param g the GraphNO to reduce
+ */
+void Graph2::toDegree2General(GraphNO& g){
+    initEmptyGraph(g.getNbVertices());
+
+    weights = g.getWeights();
+
+    for (Vertex v = 0; v < g.getNbVertices(); v++) {
+        if(getDegree(v) < 2){
+            std::vector<Vertex> voisins = g.getNeighbors(v);
+            selectRandomNeighborsGNO(g, v);
+        }
+    }
+}
+
+/**
+ * @brief Select (at random) a maximum of 2 random graphNO-neighbors of a vertex, and creates according edges in the graph2-reduction
+ * 
+ * @param g the GraphNO to reduce
+ * @param v a vertex
+ */
+void Graph2::selectRandomNeighborsGNO(GraphNO& g, Vertex v){
+    vector<Vertex> voisins = g.getNeighbors(v);
+    const int nbVoisins = voisins.size();
+    int rbuf = -1;
+    int out_loops = 0;
+    while(getDegree(v) < min(nbVoisins, 2) && out_loops < 2){
+        int in_loops = 0;
+        Vertex rv;
+        do{
+            rv = voisins[rand()%nbVoisins];
+            in_loops++;
+        }while(getDegree(rv) >= 2 && in_loops <nbVoisins && rv == rbuf);
+        if(getDegree(rv) < 2 && rv != rbuf){
+            addEdgeBi(v, rv);
+            rbuf = rv;
+        }
+        out_loops++;
+    }
+}
+
+void Graph2::toDegree2Alea(GraphNO& g){
+    initEmptyGraph(g.getNbVertices());
+
+    weights = g.getWeights();
+
+    const float constructRate = 0.1; 
+
+    vector<std::pair<Vertex, float>> sortedDegree;
+    vector<int> degrees (nbVertex, 0);
+    vector<bool> selected (nbVertex, false);
+
+    for(int i = 0; i < nbVertex; i++){
+        sortedDegree.emplace_back(make_pair(i, log(weights[i]) / (float) (g.getDegree(i)+1)));
+    }
+    std::sort(sortedDegree.begin(), sortedDegree.end(),[](std::pair<Vertex,float> i, std::pair<Vertex, float> j) {return i.second  < j.second ;});
+    int begin = 0;
+    int end = nbVertex - 1;
+
+    while(begin != end){
+        float r = (rand()%100)/100.;
+        Vertex currentVertex;
+        if( r < constructRate){
+            //constructif, on ajoute le sommet au meilleur ratio   
+            do{
+                currentVertex = sortedDegree[begin].first;
+                begin++; 
+            }while(degrees[currentVertex] > 2 && begin < nbVertex);
+            selected[currentVertex] = true;
+            vector<Vertex> voisins = g.getNeighbors(currentVertex);
+
+            for(Vertex v : voisins){
+                //TODO: ajouter une liaison avec le sommet qui a le PIRE ratio, implique de faire des tris et tout
+
+                if(degrees[v] < 2 && selected[v] && degrees[currentVertex] < 2){
+                    addEdge(currentVertex, v);
+                }
+            }  
+        }else{
+            //destructif, on enlève le sommet au pire ratio (il est à false donc c'est bon)
+            end--;
+        }
+    }
+}
+
+/**
+ * @brief a graph2-reduction algorithm that SHOULD give the sub-graph with the highest possible cost
+ * 
+ * @param g the graphNO to reduce
+ */
+void Graph2::toDegree2Max(GraphNO& g){
+    initEmptyGraph(g.getNbVertices());
+
+    weights = g.getWeights();
+
+    vector<std::pair<Vertex, float>> sortedRatio;
+
+    for(int i = 0; i < nbVertex; i++){
+        sortedRatio.emplace_back(make_pair(i, weights[i]));
+    }
+    sortByRatio(sortedRatio);
+    int begin = 0;
+    int end = nbVertex - 1;
+
+    while(begin != end){
+        Vertex currentVertex;
+        do{
+            currentVertex = sortedRatio[begin].first;
+            begin++; 
+        }while(getDegree(currentVertex) >= 2 && begin < end);
+
+        if(getDegree(currentVertex) < 2 && g.getDegree(currentVertex) > 0){
+            //get its neighbor that has the lowest ratio
+            //sol 1 :
+            vector<std::pair<Vertex, float>> sortedVoisins;
+            for(Vertex v : g.getNeighbors(currentVertex)){
+                sortedVoisins.emplace_back(make_pair(v, log(weights[v])/(float) (g.getDegree(v)+1)));
+            }
+            sortByRatio(sortedVoisins);
+            int cursor = 1;
+            Vertex interestNeighbor;
+            do{
+                interestNeighbor = sortedVoisins[sortedVoisins.size() - cursor].first;
+                cursor++;
+                if(getDegree(interestNeighbor) < 2){
+                    addEdgeBi(currentVertex, interestNeighbor);
+                }
+            }while(getDegree(currentVertex) < 2 && cursor <= sortedVoisins.size());   
+        }
+    }
+}
+
+void Graph2::sortByRatio(vector<std::pair<Vertex, float>>& list){
+    std::sort(list.begin(), list.end(),[](std::pair<Vertex,float> i, std::pair<Vertex, float> j) {return i.second  > j.second ;});
+} 
 
 void Graph2::importGraphDIMACS(char* file) {
     int MAX_PREAMBLE = 4000;
@@ -407,7 +564,7 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe2() {
 
 void Graph2::displayCompConnexe() {
     cout << endl;
-    display();
+    display2();
     vector<composanteConnexe> list = decoupeCompConnexe2();
     for (const composanteConnexe& c : list) {
         cout << c.size << " ";

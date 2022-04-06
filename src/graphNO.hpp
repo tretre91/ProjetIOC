@@ -13,6 +13,7 @@ private:
    Vertex nbVertex;
    void get_params(char * Preamble);
    void removeEdge(Vertex v1, Vertex v2);
+   vector<float> weights;
 
 public:
    void initEmptyGraph(Vertex nbVertices);
@@ -21,6 +22,7 @@ public:
    void markingNeighbors(Vertex v1, std::vector<bool> & v);
    void addEdge(Vertex v1, Vertex v2);
    Vertex getNbVertices(){return nbVertex;};
+   vector<float> getWeights(){return weights;};
    void deleteGraph(){matrix.clear();nbVertex=0;};
    void importGraphDIMACS( char *file);
    void display();

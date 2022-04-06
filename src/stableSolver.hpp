@@ -29,10 +29,11 @@ public:
         return bestCost;
     }
 
+    Graph2 getGraph2(){ return graph2;}
+
     unsigned int getSize() const {
         return currentSize;
     }
-   
 };
 
 #endif // !STABLE_SOLVER_HPP

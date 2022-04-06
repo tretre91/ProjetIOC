@@ -5,6 +5,7 @@
 
 void GraphNO::initEmptyGraph(Vertex nbVertices) {
    nbVertex=nbVertices;
+   weights.resize(nbVertex, 1.0f);
    matrix.clear();
    matrix.resize(nbVertex *nbVertex);
    matrix.shrink_to_fit();

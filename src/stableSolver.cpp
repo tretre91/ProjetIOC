@@ -1,8 +1,10 @@
 #include "stableSolver.hpp"
 #include <algorithm>
+#include <random>
 
 void StableSolver::updateFixed(const vector<std::pair<Vertex, bool>>& list) {
     weights.clear();
+    weights = graph2.getWeights();
     weights.resize(nbVertex, 1.0f);
     for (const pair<Vertex, bool>& p : list) {
         weights[p.first] = p.second ? 10.f : -10.f;
@@ -11,19 +13,10 @@ void StableSolver::updateFixed(const vector<std::pair<Vertex, bool>>& list) {
 
 void StableSolver::init(GraphNO& g) {
     graph = g; // TODO
-    graph2.toDegree2(g);
+    graph2.toDegree2Max(g);
     nbVertex = graph2.getNbVertices();
 }
 
-<<<<<<< HEAD
-float StableSolver::solve() {
-    bestCost = 0;
-    for (auto& comp : graph.decoupeCompConnexe2()) {
-        solveComp(comp);
-        bestCost += currentCost;
-    }
-    return bestCost;
-=======
 void StableSolver::solve() {
     initSolution();
     currentSize = 0;
@@ -32,7 +25,6 @@ void StableSolver::solve() {
     }
 
     updateBestSolution();
->>>>>>> 06122fb7301d69d8c0723711a5965cc9ed68ff39
 }
 
 void StableSolver::solveComp(const composanteConnexe& comp) {
@@ -40,6 +32,7 @@ void StableSolver::solveComp(const composanteConnexe& comp) {
     case typeGraphe::SOLO:
         currentCost += weights[comp.neighbors[0].id];
         currentSize++;
+        currentSolution[comp.neighbors[0].id] = true;
         break;
     case typeGraphe::CHAINE:
         solveLine(comp);
