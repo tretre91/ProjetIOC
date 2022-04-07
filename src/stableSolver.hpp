@@ -1,10 +1,11 @@
 #ifndef STABLE_SOLVER_HPP
 #define STABLE_SOLVER_HPP
 
-#include <utility>
-#include <vector>
 #include "graph2.hpp"
 #include "weightedMaximumStableSolver.hpp"
+#include <string>
+#include <utility>
+#include <vector>
 
 typedef unsigned int Vertex;
 
@@ -25,6 +26,8 @@ public:
 
     void solve();
 
+    void solveRandomizedHeuristic(float fix_probability);
+
     float getCost() const {
         return bestCost;
     }
@@ -32,7 +35,11 @@ public:
     unsigned int getSize() const {
         return currentSize;
     }
-   
+
+    /**
+     * @brief Importe un graphe DIMACS .wcol et renvoie le nombre de sommets et d'arêtes (ou {0, 0} en cas d'erreur)
+     */
+    std::pair<unsigned, unsigned> importWCol(const std::string& filename);
 };
 
 #endif // !STABLE_SOLVER_HPP
