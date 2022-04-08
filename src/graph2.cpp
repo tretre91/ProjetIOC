@@ -7,7 +7,7 @@
 void Graph2::initEmptyGraph(Vertex nbVertices) {
     nbVertex = nbVertices;
     matrix.clear();
-    matrix.resize(nbVertex, {-1, -1});
+    matrix.resize(nbVertex, {null, null});
     matrix.shrink_to_fit();
 }
 
@@ -16,7 +16,7 @@ bool Graph2::isEdge(Vertex v1, Vertex v2) {
 }
 
 void Graph2::addEdge(Vertex v, Vertex v1) {
-    if (matrix[v].first == -1) {
+    if (matrix[v].first == null) {
         matrix[v].first = v1;
     } else {
         matrix[v].second = v1;
@@ -29,14 +29,14 @@ void Graph2::addEdgeFast(Vertex v, Vertex v1, Vertex v2) {
 
 void Graph2::removeEdge(Vertex v1, Vertex v2) {
     if (matrix[v1].first == v2) {
-        matrix[v1].first = -1;
+        matrix[v1].first = null;
     } else if (matrix[v1].second == v2) {
-        matrix[v1].second = -1;
+        matrix[v1].second = null;
     }
 }
 
 bool Graph2::hasNoNeighbor(Vertex v1) {
-    return matrix[v1].first == -1 && matrix[v1].second == -1;
+    return matrix[v1].first == null && matrix[v1].second == null;
 }
 
 /*void Graph2::toComplementGraph() {
@@ -57,17 +57,17 @@ void Graph2::display() {
         int val = 0;
         int v1;
         int v2;
-        if (matrix[vertex].first != -1) {
+        if (matrix[vertex].first != null) {
             val++;
             v1 = matrix[vertex].first;
         } else {
-            v1 = -1;
+            v1 = null;
         }
-        if (matrix[vertex].second != -1) {
+        if (matrix[vertex].second != null) {
             val++;
             v2 = matrix[vertex].first;
         } else {
-            v2 = -1;
+            v2 = null;
         }
         cout << v1 << " & " << v2 << " -> " << val << endl;
     }
@@ -77,10 +77,10 @@ void Graph2::display() {
 // Même chose que getDegree, mais en arrêtant de chercher dès qu'on a 2 voisins
 Vertex Graph2::getDegree(Vertex vertex) {
     int val = 0;
-    if (matrix[vertex].first != -1) {
+    if (matrix[vertex].first != null) {
         val++;
     }
-    if (matrix[vertex].second != -1) {
+    if (matrix[vertex].second != null) {
         val++;
     }
     return val;
@@ -138,16 +138,40 @@ void Graph2::get_params(char* Preamble)
     nbVertex = Nr_vert;
 }
 
-void Graph2::toDegree2(GraphNO& g) {
-    initEmptyGraph(g.getNbVertices());
+void Graph2::toDegree2(GraphNO& g, const std::vector<bool>& marked) {
+    // recupere les voisins marques d'un sommet
+    auto getMarkedNeighbors = [&](Vertex v) {
+        std::vector<Vertex> voisins;
+        for (Vertex v2 = 0; v2 < g.getNbVertices(); v2++) {
+            if (g.isEdge(v, v2) && marked[v2]) {
+                voisins.push_back(v2);
+            }
+        }
+        return voisins;
+    };
 
-    for (Vertex v = 0; v < g.getNbVertices(); v++) {
-        std::vector<Vertex> voisins = g.getNeighbors(v);
+    // fais la correspondance entre le num de sommet dang g et dans graph2
+    std::vector<Vertex> indexInGraph2(marked.size(), null);
+    Vertex index = 0;
+    for (size_t i = 0; i < marked.size(); i++) {
+        if (marked[i]) {
+            indexInGraph2[i] = index++;
+        }
+    }
 
-        if (voisins.size() == 1) {
-            addEdge(v, voisins[0]);
-        } else if (voisins.size() == 2) {
-            addEdgeFast(v, voisins[0], voisins[1]);
+    initEmptyGraph(index);
+    std::vector<Vertex> voisins;
+
+    for (Vertex v = 0; v < nbVertex; v++) {
+        Vertex v2 = indexInGraph2[v];
+        if (v2 != null) {
+            voisins = getMarkedNeighbors(v);
+            if (voisins.size() == 1) {
+                addEdge(v2, indexInGraph2[voisins[0]]);
+            }
+            else if (voisins.size() == 2) {
+                addEdgeFast(v2, indexInGraph2[voisins[0]], indexInGraph2[voisins[1]]);
+            }
         }
     }
 }
@@ -183,7 +207,7 @@ void Graph2::importGraphDIMACS(char* file) {
                 printf("ERROR: corrupted inputfile\n");
                 exit(10);
             }
-            // addEdge(i-1, j-1);
+            // addEdge(inull, jnull);
             // if( (i, j) != (0, 0)){ //jsp exactement ce qui fait ça mais tant pis
             addEdgeFast(n, i, j);
             // weights[n] = k;
@@ -241,7 +265,7 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe() {
 
             // setup de la node
             node currentNode;
-            currentNode.neighbors = make_pair(-1, -1);
+            currentNode.neighbors = make_pair(null, null);
             currentNode.id = idmin;
             // currentComposanteConnexe.weight.push_back(weights[idmin]);
 
@@ -256,7 +280,7 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe() {
             node leaderNode;
             leaderNode.id = idmin;
             // currentComposanteConnexe.weight.push_back(weights[idmin]);
-            leaderNode.neighbors = make_pair(currentVertex, -1);
+            leaderNode.neighbors = make_pair(currentVertex, null);
             currentComposanteConnexe.neighbors.push_back(leaderNode);
             Vertex previousVertex = idmin;
 
@@ -287,7 +311,7 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe() {
                     previousVertex = tmp;
                 } else { // cas fin de chaîne
                     over = true;
-                    currentNode.neighbors = make_pair(previousVertex, -1);
+                    currentNode.neighbors = make_pair(previousVertex, null);
                 }
                 // maj de la composante connexe
                 currentComposanteConnexe.size++;
@@ -336,7 +360,7 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe() {
                         previousVertex = tmp;
                     }
                 } else { // cas sommet de degré 1
-                    currentNode.neighbors = make_pair(previousVertex, -1);
+                    currentNode.neighbors = make_pair(previousVertex, null);
                     previousVertex = idmin;
                     currentVertex = startingNeighbors.first;
                     if (switchedDirection) {
@@ -370,12 +394,12 @@ vector<composanteConnexe> Graph2::decoupeCompConnexe2() {
     for (Vertex v = 0; v < nbVertex; v++) {
         if (!explored[v]) {
             if (degrees[v] == 0) {
-                composanteConnexe comp(typeGraphe::SOLO, node{v, make_pair(-1, -1)});
+                composanteConnexe comp(typeGraphe::SOLO, node{v, make_pair(null, null)});
                 comps.emplace_back(std::move(comp));
                 explored[v] = true;
             } else if (degrees[v] == 1) {
                 node first = {v, getNeighbors(v)};
-                composanteConnexe comp = explore(typeGraphe::CHAINE, explored, first, [](const node& n) { return n.neighbors.second == -1; });
+                composanteConnexe comp = explore(typeGraphe::CHAINE, explored, first, [](const node& n) { return n.neighbors.second == null; });
                 comps.emplace_back(std::move(comp));
             }
         }

@@ -1,32 +1,27 @@
 #include <stableSolver.hpp>
 #include <iostream>
 
-int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " <nom de l'instance>\n";
-        return 0;
-    }
+int main() {
+	StableSolver solver;
+	GraphNO g;
 
-    StableSolver solver;
-    GraphNO g;
-    g.importGraphDIMACS(argv[1]);
-    solver.init(g);
-    g.display();
-    std::cout << '\n';
+	g.initEmptyGraph(6);
+	g.addEdge(0, 1);
+	g.addEdge(1, 2);
+	g.addEdge(2, 3);
+	g.addEdge(3, 4);
+	g.addEdge(4, 5);
+	g.addEdge(5, 0);
+	g.addEdge(0, 3);
 
-    solver.updateFixed({});
-    solver.solve();
-    std::cout << "Stable size : " << solver.getSize() << '\n';
-    solver.displayBestSolution();
-    
-    // Decommenter cette partie si test avec custom.col
-    // on a une chaine 5 - 6 - 7, si on fixe 6, 5 et 7 ne sont plus inclus dans la solution optimale
-    
-    /* std::cout << "\nWith vertex 6 included :\n";
-    solver.updateFixed({{6u, true}});
-    solver.solve();
-    std::cout << "Stable size : " << solver.getSize() << '\n';
-    solver.displayBestSolution(); */
-    
-    return 0;
+	solver.init(g, { false, true, true, true, true, true });
+
+	g.display();
+	std::cout << '\n';
+
+	solver.solve();
+	std::cout << "Stable size : " << solver.getSize() << '\n';
+	solver.displayBestSolution();
+
+	return 0;
 }

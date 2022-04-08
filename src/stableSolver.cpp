@@ -1,18 +1,12 @@
 #include "stableSolver.hpp"
 #include <algorithm>
 
-void StableSolver::updateFixed(const vector<std::pair<Vertex, bool>>& list) {
+void StableSolver::init(GraphNO& g, const std::vector<bool>& marked) {
+    graph = g; // TODO
+    graph2.toDegree2(g, marked);
+    nbVertex = graph2.getNbVertices();
     weights.clear();
     weights.resize(nbVertex, 1.0f);
-    for (const pair<Vertex, bool>& p : list) {
-        weights[p.first] = p.second ? 10.f : -10.f;
-    }
-}
-
-void StableSolver::init(GraphNO& g) {
-    graph = g; // TODO
-    graph2.toDegree2(g);
-    nbVertex = graph2.getNbVertices();
 }
 
 void StableSolver::solve() {
