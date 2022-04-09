@@ -4,18 +4,18 @@
 #include <iostream>
 #include <random>
 
-void StableSolver::updateFixed(const vector<std::pair<Vertex, bool>>& list) {
-    weights.clear();
-    weights.resize(nbVertex, 1.0f);
-    for (const pair<Vertex, bool>& p : list) {
-        weights[p.first] = p.second ? 10.f : -10.f;
-    }
-}
-
 void StableSolver::init(GraphNO& g) {
     graph = g; // TODO
     graph2.toDegree2(g);
     nbVertex = graph2.getNbVertices();
+}
+
+void StableSolver::init(GraphNO& g, const std::vector<bool>& marked) {
+    graph = g;
+    graph2.toDegree2(g, marked);
+    nbVertex = graph2.getNbVertices();
+    weights.clear();
+    weights.resize(nbVertex, 1.0f);
 }
 
 void StableSolver::solve() {
@@ -125,6 +125,31 @@ void StableSolver::solveCycle(const composanteConnexe& comp) {
             i--;
         }
     }
+}
+
+void StableSolver::solveGreedy() {
+    initSolution();
+    std::vector<std::pair<Vertex, Vertex>> vertices(nbVertex);
+
+    for (Vertex v = 0; v < vertices.size(); v++) {
+        vertices[v] = std::make_pair(v, graph.getDegree(v));
+    }
+
+    auto compare = [&](const auto& p1, const auto& p2) { return p1.second < p2.second || (p1.second == p2.second && weights[p1.first] > weights[p2.first]); };
+
+    std::sort(vertices.begin(), vertices.end(), compare);
+
+    std::vector<Vertex> stable;
+    for (pair<Vertex, Vertex>& p : vertices) {
+        if (std::none_of(stable.begin(), stable.end(), [&](Vertex v) { return graph.isEdge(v, p.first); })) {
+            stable.push_back(p.first);
+            currentSolution[p.first] = true;
+            currentCost += weights[p.first];
+        }
+    }
+
+    currentSize = stable.size();
+    updateBestSolution();
 }
 
 void StableSolver::solveRandomizedHeuristic(float fix_probability) {
@@ -249,8 +274,8 @@ std::pair<unsigned, unsigned> StableSolver::importWCol(const std::string& filena
     while (file >> line_type) {
         switch (line_type) {
         case 'c': // comment
-            std::getline(file, tmp);
             file.ignore();
+            std::getline(file, tmp);
             break;
         case 'p': // preamble
             if (nbVertex != 0) {
@@ -272,6 +297,9 @@ std::pair<unsigned, unsigned> StableSolver::importWCol(const std::string& filena
             break;
         default:
             std::cerr << "WARNING: unknown line type '" << line_type << "'\n";
+            file.ignore();
+            std::getline(file, tmp);
+            std::cerr << "Ignored line '" << tmp << "'\n";
             break;
         }
     }

@@ -20,13 +20,19 @@ private:
     void solveCycle(const composanteConnexe& comp);
 
 public:
-    void updateFixed(const vector<std::pair<Vertex, bool>>& list);
-
     void init(GraphNO& graph);
+
+    void init(GraphNO& graph, const std::vector<bool>& marked = {});
 
     void solve();
 
+    void solveGreedy();
+
     void solveRandomizedHeuristic(float fix_probability);
+
+    float getCurrentCost() const {
+        return currentCost;
+    }
 
     float getCost() const {
         return bestCost;

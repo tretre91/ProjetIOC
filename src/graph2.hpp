@@ -3,6 +3,7 @@
 
 #include "graphNO.hpp"
 #include <vector>
+#include <limits>
 using namespace std;
 
 typedef unsigned int Vertex;
@@ -32,6 +33,7 @@ struct composanteConnexe {
 class Graph2
 {
 private:
+    static constexpr Vertex null = std::numeric_limits<Vertex>::max();
     vector<std::pair<Vertex, Vertex>> matrix; // ou passer en vector, où les voisins de vertex sont à l'indice vertex et vertex+1
     Vertex nbVertex;
     void get_params(char* Preamble);
@@ -42,6 +44,7 @@ private:
 
 public:
     void toDegree2(GraphNO& g);
+    void toDegree2(GraphNO& g, const std::vector<bool>& marked);
     void initEmptyGraph(Vertex nbVertices);
     bool isEdge(Vertex v, Vertex v1);
     bool hasNoNeighbor(Vertex v1);
