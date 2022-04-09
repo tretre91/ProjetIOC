@@ -64,7 +64,7 @@ vector<std::string> initInstancesDegree2(){
 }
 
 vector<std::string> initInstances(){
-    int nbInstances = 10;
+    int nbInstances = 1;
     vector<std::string> listFile;
     std::string path = "../test/RandomInstances/";
     //srand((unsigned int) time(0)); //c'est peut être pas si mal d'avoir les même instances à chaque génération
@@ -78,95 +78,61 @@ vector<std::string> initInstances(){
             file << "c FILE: " << name <<endl;
             file << "c SOURCE: initInstances" << endl;
             
-            int nbVertex = 10 + rand()%10;
-            int nbEdge = rand()%(4*nbVertex);
+            random_device dev;
+            mt19937 engine(dev());
+            uniform_int_distribution<unsigned int> random(2000, 10000);
+            int nbVertex = 10 + (int) random(engine);
+            int nbEdge = (int) (random(engine))%(4*nbVertex);
 
             //p carac
-            file << "p edge " << nbVertex << " " << nbEdge << endl;
+            file << "p edge " << nbVertex << " " << 0 << endl;
             
-            //e edges
-            //std::string edges;
-            //tant qu'on a pas placé nbEdge edge, on fait
+            normal_distribution<float> distribEdge( nbEdge / (float) nbVertex, 1);
+            vector<int> degree (nbVertex, 0);
             int vertexGenerated = 1;
-            int edgePlaced = 0;
 
-            while(vertexGenerated <= nbVertex){
-                float r = rand()/(float) RAND_MAX; //ma chance de générer doit baisser à chaque edge ajouté
-                //si je veux 10 edge par vertex, il me faut une chance de drop le vertex en cours exponentielle, qui est significative à partir de 6, et spike autour de 11-12
-                //random_device rd{};
-                //normal_distribution<> d{ev, ev/log(ev)}
-                for(int i = vertexGenerated + 1; i <= nbVertex; i++){
-                    if(r < 1. - (nbVertex/ (float) nbEdge)){
-                        //edges += "e " + to_string(vertexGenerated) + " " + to_string(i) + '\n';
-                        //cout << "Added bond : " << vertexGenerated << " - " << i << endl;
-                        file << "e " << vertexGenerated << " " << i << endl;
-                        edgePlaced++;
-                    }
+            while(vertexGenerated < nbVertex - 1){
+                uniform_int_distribution<unsigned int> distribVertex(vertexGenerated+1, nbVertex);
+                int toPlace = ceil(distribEdge(engine));
+                while(degree[vertexGenerated] < toPlace){
+                    Vertex selected = ceil(distribVertex(engine));
+                    file << "e " << vertexGenerated << " " << selected << endl;
+                    degree[vertexGenerated]++;
+                    degree[selected]++;
                 }
                 vertexGenerated++;
             }
-
-            //file << edges;
         }else{
             printf("ERROR: Cannot open outfile\n");
         }
-        //cout << path+name <<endl;
-        //listFile
         listFile.emplace_back(path + name);
     }
     return listFile;
 }
 
 int main(int argc, char* argv[]) {
-    vector<string> listInstancesD2 =  initInstancesDegree2();
+    //vector<string> listInstancesD2 =  initInstancesDegree2();
     vector<string> listInstances = initInstances();
-
+    cout << "Instances generated" << endl;
     StableSolver solver;
     
     GraphNO g;
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    /*for(string pathname : listInstancesD2){
+    for(string pathname : listInstances){
         cout << pathname <<endl;
         g.importGraphDIMACS(const_cast<char*>(pathname.c_str()));
-        
-        //cout << "-----Regular Display-----" << endl;
-        //g.display();
-        //cout << "-----INIT-----" << endl;
+
         solver.init(g);
-        //cout << "-----ToDegree2 Display-----" << endl;
-        //solver.getGraph2().display2();
+
         solver.updateFixed({});
 
-        //fout << pathname << ", ";
-        //solver.getGraph2().display();
         auto start = std::chrono::high_resolution_clock::now();
         solver.solve();
         std::chrono::duration<double> tempsSeq = std::chrono::high_resolution_clock::now() - start;
         cout << "Solved in " << tempsSeq.count() << " s" << '\n';
         std::cout << "Backtracking : " << solver.getSize() << '\n';
-    }*/
-
-    for(string pathname : listInstances){
-        cout << pathname <<endl;
-        g.importGraphDIMACS(const_cast<char*>(pathname.c_str()));
-        //cout << "-----Regular Display-----" << endl;
-        g.display();
-        //cout << "-----INIT-----" << endl;
-        solver.init(g);
-        //cout << "-----ToDegree2 Display-----" << endl;
-        //solver.getGraph2().display2();
-        solver.updateFixed({});
-
-         auto start = std::chrono::high_resolution_clock::now();
-        solver.solve();
-        std::chrono::duration<double> tempsSeq = std::chrono::high_resolution_clock::now() - start;
-        cout << "Solved in " << tempsSeq.count() << " s" << '\n';
-        std::cout << "Backtracking : " << solver.getSize() << '\n';
     }
-
-    //g.importGraphDIMACS("/home/brice/Bureau/IOC/ProjetIOC/test/instances/custom.col");
-    //fout.close();
     return 0;
 }

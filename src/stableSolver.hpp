@@ -5,6 +5,7 @@
 #include <vector>
 #include "graph2.hpp"
 #include "weightedMaximumStableSolver.hpp"
+#include <string>
 
 typedef unsigned int Vertex;
 
@@ -17,6 +18,9 @@ private:
     void solveComp(const composanteConnexe& comp);
     void solveLine(const composanteConnexe& comp);
     void solveCycle(const composanteConnexe& comp);
+
+    void solveRandomizedHeuristic(float fix_probability);
+    std::pair<unsigned, unsigned> importWCol(const std::string& filename);
 
 public:
     void updateFixed(const vector<std::pair<Vertex, bool>>& list);
