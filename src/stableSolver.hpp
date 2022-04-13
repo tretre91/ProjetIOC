@@ -22,7 +22,7 @@ private:
 public:
     void init(GraphNO& graph);
 
-    void init(GraphNO& graph, const std::vector<bool>& marked = {});
+    void init(GraphNO& graph, const std::vector<bool>& marked);
 
     void solve();
 

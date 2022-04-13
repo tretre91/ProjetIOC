@@ -10,11 +10,11 @@ int main(int argc, char* argv[]) {
     StableSolver solver;
     GraphNO g;
     g.importGraphDIMACS(argv[1]);
-    solver.init(g);
+    std::vector<bool> marked(g.getNbVertices(), true);
+    solver.init(g, marked);
     g.display();
     std::cout << '\n';
 
-    solver.updateFixed({});
     solver.solve();
     std::cout << "Stable size : " << solver.getSize() << '\n';
     solver.displayBestSolution();
